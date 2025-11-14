@@ -9,6 +9,13 @@ app.get("/hello", (req, res) => {
   res.send("Hello, World! This is your API.");
 });
 
+// Define a sample API endpoint
+app.get("/hello/api/greet", (req, res) => {
+  res.json({ message: "Hello from the API!" });
+});
+
+
+
 // Start the server on port 3000
 const port = 3000;
 app.listen(port, () => {
