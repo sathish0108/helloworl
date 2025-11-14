@@ -14,10 +14,8 @@ app.get("/hello/api/greet", (req, res) => {
   res.json({ message: "Hello from the API!" });
 });
 
-
-
 // Start the server on port 3000
-const port = 3000;
+const port = 8002;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
