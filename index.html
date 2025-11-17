@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PM2 Control Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #ccc;
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 5px 0;
+        width: 100%;
+        font-size: 16px;
+      }
+      button {
+        cursor: pointer;
+        background: #007bff;
+        border: none;
+        color: white;
+        border-radius: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .output {
+        white-space: pre-wrap;
+        background: #000;
+        color: #0f0;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+        height: 300px;
+        overflow-y: scroll;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      h2 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>PM2 Control Dashboard</h2>
+
+      <label>API Base URL</label>
+      <input id="baseUrl" value="https://meta.novactech.in/immerz" />
+
+      <label>API Key</label>
+      <input id="apiKey" type="password" placeholder="Enter x-api-key" />
+
+      <label>Process ID or Name (or use 'all')</label>
+      <input id="processId" placeholder="99 or canara4000 or all" />
+
+      <button onclick="callApi('status')">🔍 Get Status</button>
+      <button onclick="callApi('describe')">📌 Describe</button>
+      <button onclick="callApi('restart')">🔁 Restart</button>
+      <button onclick="callApi('stop')">🛑 Stop</button>
+      <button onclick="callApi('logs')">📄 Logs</button>
+      <button onclick="callApi('update')">⬆️ Update (Git Pull + Restart)</button>
+
+      <div class="output" id="output">Output will appear here...</div>
+    </div>
+
+    <script>
+      async function callApi(action) {
+        const baseUrl = document.getElementById("baseUrl").value.trim();
+        const key = document.getElementById("apiKey").value.trim();
+        const id = document.getElementById("processId").value.trim() || "all";
+
+        let url = "";
+        let method = "GET";
+        let showRaw = false;
+
+        switch (action) {
+          case "status":
+            url = `${baseUrl}/pm2/status/${id}`;
+            break;
+
+          case "describe":
+            url = `${baseUrl}/pm2/describe/${id}`;
+            break;
+
+          case "restart":
+            url = `${baseUrl}/pm2/restart/${id}`;
+            method = "POST";
+            break;
+
+          case "stop":
+            url = `${baseUrl}/pm2/stop/${id}`;
+            method = "POST";
+            break;
+
+          case "logs":
+            url = `${baseUrl}/pm2/logs/${id}`;
+            showRaw = true;
+            break;
+
+          case "update":
+            url = `${baseUrl}/pm2/update/${id}`;
+            method = "POST";
+            break;
+        }
+
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: {
+              "x-api-key": "supersecret123",
+            },
+          });
+
+          const text = await res.text();
+
+          // Try to parse JSON; if fails, show raw text
+          try {
+            document.getElementById("output").textContent = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {
+            document.getElementById("output").textContent = text;
+          }
+        } catch (err) {
+          document.getElementById("output").textContent = "Error: " + err;
+        }
+      }
+    </script>
+  </body>
+</html>
